@@ -75,10 +75,3 @@ python run_gaussian_experiment.py
 Output:
 Results saved to CSV files in the experiment directory.
 Processed images saved to dithered_output/ or blurred_output/ in the experiment directory.
-
-Using your own dataset:
-Edit configuration section in the scripts:
-  - BASE_DIR: Path to your dataset directory
-  - COMPRESSION_LEVELS: List of subdirectory names to test
-  - OUTPUT_DIR: Where to save processed images
-  - BLUR_RADII (gaussian only): Blur strengths to test
