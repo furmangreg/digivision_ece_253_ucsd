@@ -20,25 +20,34 @@ import sys
 sys.path.append('../../model')
 from models import get_resnet
 
-# Configuration
+# ==================== Configuration ====================
+# Model path
+MODEL_PATH = '../../model/resnet18_binary_best.pth'
+
+# Dataset paths
+# BASE_DIR should contain subdirectories with compressed images
+# Each subdirectory should have 'car/' and 'background/' folders
+# Default: Uses provided sample data in final_pipeline_data/miotcd_preprocessing/
+BASE_DIR = Path('../../final_pipeline_data/miotcd_preprocessing')
+
+# Output directory for blurred images
+OUTPUT_DIR = Path('./blurred_output')
+
+# Results CSV filename
+RESULTS_FILE = 'gaussian_blur_results.csv'
+
+# Compression levels to test (subdirectory names under BASE_DIR)
+# Default levels match the provided sample data
 COMPRESSION_LEVELS = [
-    'filtered_images_sigma_0.5_quality_BAD',
-    'filtered_images_sigma_1_quality_BAD',
-    'filtered_images_sigma_1.5_quality_BAD',
-    'filtered_images_sigma_2_quality_BAD',
-    'filtered_images_sigma_2.5_quality_BAD',
-    'filtered_images_sigma_3_quality_BAD',
-    'filtered_images_sigma_3.5_quality_BAD',
-    'filtered_images_sigma_4_quality_BAD',
-    'filtered_images_sigma_4.5_quality_BAD',
-    'filtered_images_sigma_5_quality_BAD'
+    'compressed_quality_0',
+    'compressed_quality_1',
+    'compressed_quality_2',
+    'compressed_quality_3'
 ]
 
-BLUR_RADII = [0.5, 1.0, 2.0]  # Different blur strengths to test
-MODEL_PATH = '../../model/resnet18_binary_best.pth'  # Using working car vs background model
-BASE_DIR = Path('../data/filtered_images_quality_BAD')
-OUTPUT_BASE = Path('../data/miotcd_blurred_2')
-RESULTS_FILE = 'gaussian_blur_results2.csv'
+# Gaussian blur radii to test (in pixels)
+BLUR_RADII = [0.5, 1.0, 2.0]
+# ====================================================
 
 
 def apply_gaussian_blur_to_dataset(input_dir, output_dir, radius):
@@ -176,7 +185,7 @@ def main():
 
         input_dir = BASE_DIR / comp_level
         if not input_dir.exists():
-            print(f"  ⚠ Directory not found, skipping")
+            print(f"  Warning: {input_dir} does not exist, skipping...")
             continue
 
         # Evaluate original (no blur)
@@ -193,7 +202,7 @@ def main():
 
         # Apply and evaluate each blur radius
         for radius in BLUR_RADII:
-            output_dir = OUTPUT_BASE / f"{comp_level}_blur_{radius}"
+            output_dir = OUTPUT_DIR / f"{comp_level}_blur_{radius}"
 
             # Apply blur
             apply_gaussian_blur_to_dataset(input_dir, output_dir, radius)
@@ -218,7 +227,7 @@ def main():
     print("EXPERIMENT COMPLETE!")
     print("="*70)
     print(f"\nResults saved to: {RESULTS_FILE}")
-    print(f"Blurred datasets saved to: {OUTPUT_BASE}/")
+    print(f"Blurred datasets saved to: {OUTPUT_DIR}/")
 
     # Print summary
     print("\n" + "="*70)
